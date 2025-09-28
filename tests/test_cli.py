@@ -51,3 +51,81 @@ def test_cli_generates_markdown(tmp_path, monkeypatch):
 
     text = out_file.read_text(encoding="utf-8")
     assert "# Article" in text and "Hello world" in text
+
+
+def test_cli_no_cache(tmp_path, monkeypatch):
+    monkeypatch.setenv("OPENROUTER_API_KEY", "DUMMY")
+    _install_fake_openrouter()
+    import importlib
+
+    import cli as _cli
+
+    importlib.reload(_cli)
+    calls = {"scaffold": 0, "hydrate": 0}
+
+    def _scaffold(*a, **kw):  # noqa: ANN001, ANN002
+        calls["scaffold"] += 1
+        return "outline"
+
+    def _hydrate(*a, **kw):  # noqa: ANN001, ANN002
+        calls["hydrate"] += 1
+        return "article"
+
+    monkeypatch.setattr(_cli, "scaffold_article", _scaffold)
+    monkeypatch.setattr(_cli, "hydrate_article", _hydrate)
+
+    out_file = tmp_path / "a.md"
+    argv = [
+        "cli.py",
+        "--prompt",
+        "Title",
+        "--output",
+        str(out_file),
+        "--no-cache",
+    ]
+    monkeypatch.setattr(sys, "argv", argv)
+    _cli.main()
+    assert calls["scaffold"] == 1 and calls["hydrate"] == 1
+
+
+def test_cli_cache_dir(tmp_path, monkeypatch):
+    monkeypatch.setenv("OPENROUTER_API_KEY", "DUMMY")
+    _install_fake_openrouter()
+    import importlib
+
+    import cli as _cli
+
+    importlib.reload(_cli)
+
+    # Force deterministic output for caching
+    monkeypatch.setattr(_cli, "scaffold_article", lambda *a, **k: "outline")
+    monkeypatch.setattr(_cli, "hydrate_article", lambda *a, **k: "article")
+
+    cache_dir = tmp_path / "cache"
+    out_file1 = tmp_path / "first.md"
+    argv = [
+        "cli.py",
+        "--prompt",
+        "Title",
+        "--output",
+        str(out_file1),
+        "--cache-dir",
+        str(cache_dir),
+    ]
+    monkeypatch.setattr(sys, "argv", argv)
+    _cli.main()
+
+    # Second run should reuse cache (no assertions on calls as we stubbed deterministic functions)
+    out_file2 = tmp_path / "second.md"
+    argv2 = [
+        "cli.py",
+        "--prompt",
+        "Title",
+        "--output",
+        str(out_file2),
+        "--cache-dir",
+        str(cache_dir),
+    ]
+    monkeypatch.setattr(sys, "argv", argv2)
+    _cli.main()
+    assert out_file1.exists() and out_file2.exists()
