@@ -58,7 +58,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Article Generator CLI")
     parser.add_argument(
         "--prompt",
-        required=True,
+        required=False,
         help="Article topic or headline",
     )
     parser.add_argument(
@@ -101,6 +101,11 @@ def main() -> None:
         help="Publish to WordPress",
     )
     parser.add_argument(
+        "--check-wp",
+        action="store_true",
+        help="Verify WordPress credentials/connectivity and exit",
+    )
+    parser.add_argument(
         "--status",
         choices=["draft", "publish"],
         default="draft",
@@ -134,6 +139,21 @@ def main() -> None:
         help="Show version and exit",
     )
     args = parser.parse_args()
+
+    # Fast path: connectivity check for WordPress
+    if args.check_wp:
+        import json
+
+        from wordpress import check_wordpress_connection
+
+        result = check_wordpress_connection()
+        print(json.dumps(result, indent=2))
+        if result.get("ok"):
+            return
+        raise SystemExit(1)
+
+    if not args.prompt:
+        parser.error("--prompt is required unless --check-wp is provided")
 
     if args.clear_cache:
         clear_caches()
