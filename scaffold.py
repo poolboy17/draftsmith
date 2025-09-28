@@ -5,9 +5,7 @@ from llm import client
 
 
 @lru_cache(maxsize=32)
-def scaffold_article(
-    prompt: str, links: list[str] | None = None, model: str = SCAFFOLD_MODEL
-) -> str:
+def _scaffold_article_cached(prompt: str, links_key: tuple[str, ...], model: str) -> str:
     system_prompt = (
         "You are an article scaffold generator. Output a detailed outline with headings "
         "and bullets."
@@ -16,6 +14,13 @@ def scaffold_article(
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": prompt},
     ]
-    if links:
-        messages.append({"role": "user", "content": f"Links: {links}"})
+    if links_key:
+        messages.append({"role": "user", "content": f"Links: {list(links_key)}"})
     return client.chat(model=model, messages=messages)
+
+
+def scaffold_article(
+    prompt: str, links: list[str] | None = None, model: str = SCAFFOLD_MODEL
+) -> str:
+    links_key: tuple[str, ...] = tuple(links) if links else ()
+    return _scaffold_article_cached(prompt, links_key, model)

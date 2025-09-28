@@ -20,7 +20,9 @@ logging.basicConfig(level=logging.INFO)
 
 def clear_caches():
     from hydrate import hydrate_article as _hy
-    from scaffold import scaffold_article as _sc
+
+    # scaffold.scaffold_article delegates caching to _scaffold_article_cached
+    from scaffold import _scaffold_article_cached as _sc
 
     _sc.cache_clear()
     _hy.cache_clear()
