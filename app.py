@@ -12,7 +12,6 @@ from hydrate import hydrate_article
 from linker import fetch_links
 from scaffold import scaffold_article
 
-
 # Load environment variables from .env
 load_dotenv()
 
