@@ -1,0 +1,10 @@
+openrouter
+requests
+markdown
+python-dotenv
+pytest
+pytest-cov
+autopep8
+black
+flake8
+pre-commit
