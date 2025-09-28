@@ -64,9 +64,9 @@ python cli.py --prompt "My Post" --fetch-links --publish --status draft --catego
 ### DRY_RUN behavior
 
 - When `--dry-run` is used, or `DRY_RUN=1` is set in the environment:
-    - LLM calls return deterministic stub content prefixed with `[DRY_RUN:<model>]` and echo the last user message.
-    - Link fetching returns stub links if `SERPAPI_KEY` is missing.
-    - WordPress publishing is skipped.
+  - LLM calls return deterministic stub content prefixed with `[DRY_RUN:<model>]` and echo the last user message.
+  - Link fetching returns stub links if `SERPAPI_KEY` is missing.
+  - WordPress publishing is skipped.
 
 ### Env
 
