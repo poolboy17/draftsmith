@@ -11,8 +11,8 @@ from hydrate import hydrate_article
 from linker import fetch_links
 from output import write_output
 from scaffold import scaffold_article
-from wordpress import publish_to_wordpress
 from version import __version__
+from wordpress import publish_to_wordpress
 
 load_dotenv()
 

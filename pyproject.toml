@@ -2,3 +2,15 @@
 line-length = 100
 target-version = ["py311", "py312"]
 skip-string-normalization = true
+
+[tool.semantic_release]
+# Use Conventional Commits (angular) parsing to determine next version
+version_source = "commit"
+branch = "main"
+version_variable = ["version.py:__version__"]
+changelog_file = "CHANGELOG.md"
+build_command = ""
+upload_to_pypi = false
+tag_format = "v{version}"
+commit_parser = "angular"
+major_on_zero = true
