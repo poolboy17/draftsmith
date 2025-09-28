@@ -11,6 +11,7 @@ from config import MAX_LINKS
 from hydrate import hydrate_article
 from linker import fetch_links
 from scaffold import scaffold_article
+from wordpress import check_wordpress_connection
 
 # Load environment variables from .env
 load_dotenv()
@@ -69,3 +70,20 @@ async def generate(request: Request, prompt: str = Form(...), fetch_links_flag: 
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.get("/health/wp")
+async def health_wp():
+    # Returns a minimal summary of WP connectivity (safe GET only)
+    result = check_wordpress_connection()
+    # Do not echo secrets; include only safe fields
+    user = result.get("user")
+    user_id = user.get("id") if isinstance(user, dict) else None
+    user_name = user.get("name") if isinstance(user, dict) else None
+    return {
+        "ok": result.get("ok"),
+        "status_code": result.get("status_code"),
+        "url": result.get("url"),
+        "user": {"id": user_id, "name": user_name},
+        "error": result.get("error") if not result.get("ok") else None,
+    }
