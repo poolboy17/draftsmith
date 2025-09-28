@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+// Placeholder for upcoming changes. Categorize under Added/Changed/Fixed/Docs/CI as needed.
+
 ## [0.1.0] - 2025-09-27
 
 ### Added
@@ -19,4 +23,5 @@ All notable changes to this project will be documented in this file.
 
 - README with setup, usage, flags, and environment variables.
 
-[0.1.0]: https://github.com/poolboy17/draftsmith/releases/tag/v0.1.0
+ [Unreleased]: https://github.com/poolboy17/draftsmith/compare/v0.1.0...HEAD
+ [0.1.0]: https://github.com/poolboy17/draftsmith/releases/tag/v0.1.0
