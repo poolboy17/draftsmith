@@ -2,6 +2,9 @@ openrouter
 requests
 markdown
 python-dotenv
+fastapi
+uvicorn
+jinja2
 pytest
 pytest-cov
 autopep8

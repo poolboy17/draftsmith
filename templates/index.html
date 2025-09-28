@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Draftsmith</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 2rem; }
+      form { max-width: 720px; }
+      textarea { width: 100%; min-height: 8rem; font-family: inherit; font-size: 1rem; }
+      .actions { margin-top: 1rem; }
+      button { padding: .5rem 1rem; }
+      label { display: flex; align-items: center; gap: .5rem; margin-top: .5rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Draftsmith</h1>
+    <form method="post" action="/generate">
+      <p>
+        <label for="prompt-textarea">
+          <span>Prompt</span>
+        </label>
+        <textarea id="prompt-textarea" name="prompt" placeholder="Write about..." required></textarea>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" name="fetch_links_flag" /> Fetch links (SerpAPI)
+        </label>
+      </p>
+      <div class="actions">
+        <button type="submit">Generate</button>
+      </div>
+    </form>
+  </body>
+  </html>
