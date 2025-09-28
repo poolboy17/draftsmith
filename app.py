@@ -25,7 +25,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html", {})
 
 
 @app.post("/generate", response_class=HTMLResponse)
@@ -44,9 +44,9 @@ async def generate(request: Request, prompt: str = Form(...), fetch_links_flag: 
         article_html = md.markdown(article_md)
 
         return templates.TemplateResponse(
+            request,
             "result.html",
             {
-                "request": request,
                 "prompt": prompt,
                 "outline": outline,
                 "article_html": article_html,
@@ -55,9 +55,9 @@ async def generate(request: Request, prompt: str = Form(...), fetch_links_flag: 
     except Exception as exc:  # noqa: BLE001
         # Minimal error page
         return templates.TemplateResponse(
+            request,
             "result.html",
             {
-                "request": request,
                 "prompt": prompt,
                 "outline": "",
                 "article_html": f"<p>Error: {str(exc)}</p>",
