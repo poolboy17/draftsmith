@@ -1,5 +1,8 @@
 # Draftsmith
 
+[![CI](https://github.com/poolboy17/draftsmith/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/poolboy17/draftsmith/actions/workflows/ci.yml)
+[![Release](https://github.com/poolboy17/draftsmith/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/poolboy17/draftsmith/actions/workflows/release.yml)
+
 Generate, format, and optionally publish articles via CLI.
 
 ## Setup
@@ -90,3 +93,7 @@ python cli.py --prompt "My Post" --fetch-links --publish --status draft --catego
     ```
 
 CI runs formatting, linting, and tests with coverage; a `coverage.xml` report is uploaded per job.
+
+## Contributing
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, Conventional Commits, testing, and release workflow details.
