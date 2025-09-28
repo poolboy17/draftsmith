@@ -12,6 +12,7 @@ from linker import fetch_links
 from output import write_output
 from scaffold import scaffold_article
 from wordpress import publish_to_wordpress
+from version import __version__
 
 load_dotenv()
 
@@ -125,6 +126,12 @@ def main() -> None:
         "--no-cache",
         action="store_true",
         help="Disable file cache for scaffold/hydrate",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"draftsmith {__version__}",
+        help="Show version and exit",
     )
     args = parser.parse_args()
 
