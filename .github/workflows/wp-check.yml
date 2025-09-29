@@ -26,5 +26,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Create .env for CI from secrets
+        shell: bash
+        env:
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASS: ${{ secrets.WP_APP_PASS }}
+        run: |
+          cat > .env <<'EOF'
+          WP_URL=${WP_URL}
+          WP_USER=${WP_USER}
+          WP_APP_PASS=${WP_APP_PASS}
+          EOF
+
       - name: Run WordPress connectivity check
         run: python scripts/wp_check.py
