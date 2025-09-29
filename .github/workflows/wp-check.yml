@@ -1,50 +1,30 @@
 name: WordPress Connectivity Check
 
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 permissions:
-    contents: read
+  contents: read
 
 jobs:
-    check-wp:
-        name: Check WordPress connectivity
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+  check-wp:
+    name: Check WordPress connectivity
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Setup Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: "3.12"
-                  cache: "pip"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
 
-            - name: Install dependencies
-              run: |
-                  python -m pip install --upgrade pip
-                  pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-            - name: Validate required secrets
-              run: |
-                  if [ -z "${{ secrets.WP_URL }}" ]; then
-                    echo "Missing WP_URL secret"
-                    exit 1
-                  fi
-                  if [ -z "${{ secrets.WP_USER }}" ]; then
-                    echo "Missing WP_USER secret"
-                    exit 1
-                  fi
-            - name: Run WordPress connectivity check
-              env:
-                  WP_URL: ${{ secrets.WP_URL }}
-                  WP_USER: ${{ secrets.WP_USER }}
-                  WP_APP_PASS: ${{ secrets.WP_APP_PASS }}
-              run: |
-                  python scripts/wp_check.py
-                  if [ -z "${WP_URL}" ]; then
-                    echo "Error: WP_URL secret is not set."
-                    exit 1
-                  fi
-                  python scripts/wp_check.py
+      - name: Run WordPress connectivity check
+        run: python scripts/wp_check.py
