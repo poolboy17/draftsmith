@@ -118,6 +118,26 @@ def main() -> None:
         help="WordPress category IDs",
     )
     parser.add_argument(
+        "--category-names",
+        nargs="*",
+        help="WordPress category names (will be created if missing)",
+    )
+    parser.add_argument(
+        "--tags",
+        nargs="*",
+        type=int,
+        help="WordPress tag IDs",
+    )
+    parser.add_argument(
+        "--tag-names",
+        nargs="*",
+        help="WordPress tag names (will be created if missing)",
+    )
+    parser.add_argument(
+        "--featured-image",
+        help="Featured image path or URL to upload and attach",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Run without calling external services (LLM/SerpAPI/WP)",
@@ -177,8 +197,15 @@ def main() -> None:
             content_html=html,
             status=args.status,
             categories=args.categories,
+            category_names=args.category_names,
+            tags=args.tags,
+            tag_names=args.tag_names,
+            featured_image=args.featured_image,
         )
-        print(f"Published to WordPress with ID {post.get('id')}")
+        pid = post.get("id")
+        link = post.get("link") or post.get("preview_link")
+        preview = post.get("preview_link")
+        print(f"Published to WordPress: id={pid} link={link} preview={preview}")
 
     write_output(article, args.output, args.format)
 
