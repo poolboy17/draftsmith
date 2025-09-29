@@ -8,7 +8,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from config import WP_APP_PASS, WP_URL, WP_USER
+from config import MAX_MEDIA_BYTES, USER_AGENT, WP_APP_PASS, WP_URL, WP_USER
 
 
 def _session_with_retries() -> requests.Session:
@@ -37,6 +37,7 @@ def _session_with_retries() -> requests.Session:
     adapter = HTTPAdapter(max_retries=retries)
     s.mount("http://", adapter)
     s.mount("https://", adapter)
+    s.headers.update({"User-Agent": USER_AGENT, "Accept": "application/json"})
     return s
 
 
@@ -84,6 +85,14 @@ def _find_or_create_terms(
     return ids
 
 
+ALLOWED_MEDIA_TYPES = {
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+}
+
+
 def _upload_featured_media(image: str | None) -> int | None:
     if not image:
         return None
@@ -93,9 +102,19 @@ def _upload_featured_media(image: str | None) -> int | None:
     content: bytes | None = None
     if image.startswith("http://") or image.startswith("https://"):
         filename = urllib.parse.unquote(image.split("/")[-1]) or "image"
-        r = session.get(image, timeout=20)
+        r = session.get(image, timeout=20, stream=True)
         r.raise_for_status()
-        content = r.content
+        # Enforce max size
+        chunks = []
+        total = 0
+        for chunk in r.iter_content(chunk_size=8192):
+            if not chunk:
+                continue
+            total += len(chunk)
+            if total > MAX_MEDIA_BYTES:
+                raise ValueError("Featured image exceeds size limit")
+            chunks.append(chunk)
+        content = b"".join(chunks)
     else:
         filename = os.path.basename(image)
         with open(image, "rb") as f:
@@ -103,6 +122,8 @@ def _upload_featured_media(image: str | None) -> int | None:
     mime, _ = mimetypes.guess_type(filename)
     if not mime:
         mime = "application/octet-stream"
+    if mime not in ALLOWED_MEDIA_TYPES:
+        raise ValueError(f"Unsupported featured image content-type: {mime}")
     files = {"file": (filename, content, mime)}
     ep = _api_url("/wp-json/wp/v2/media")
     resp = session.post(ep, files=files, auth=auth, timeout=30)
@@ -116,7 +137,7 @@ def _merge_terms(
     if not names and not existing:
         return None
     resolved = _find_or_create_terms(taxonomy, names) if names else []
-    merged = (existing or []) + resolved
+    merged = list({int(x) for x in (existing or []) + resolved})
     return merged or None
 
 

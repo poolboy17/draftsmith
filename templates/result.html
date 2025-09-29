@@ -16,6 +16,9 @@
   <body>
     <div class="actions"><a href="/">← Back</a></div>
     <h1>Generated Result</h1>
+    {% if error %}
+    <div class="alert-error"><strong>Error:</strong> {{ error }}</div>
+    {% endif %}
     {% if prompt %}
     <p><strong>Prompt:</strong> {{ prompt }}</p>
     {% endif %}

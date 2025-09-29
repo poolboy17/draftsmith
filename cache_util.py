@@ -17,8 +17,16 @@ def cache_read(cache_dir: str, namespace: str, parts: list[str]) -> str | None:
     fname = base / f"{_key(parts)}.json"
     if not fname.exists():
         return None
-    data = json.loads(fname.read_text(encoding="utf-8"))
-    return data.get("value")
+    try:
+        data = json.loads(fname.read_text(encoding="utf-8"))
+        return data.get("value")
+    except json.JSONDecodeError:
+        # Corrupt cache entry; remove and return miss
+        try:
+            fname.unlink(missing_ok=True)
+        except Exception:  # noqa: BLE001
+            pass
+        return None
 
 
 def cache_write(cache_dir: str, namespace: str, parts: list[str], value: str) -> None:
@@ -26,4 +34,6 @@ def cache_write(cache_dir: str, namespace: str, parts: list[str], value: str) ->
     base.mkdir(parents=True, exist_ok=True)
     fname = base / f"{_key(parts)}.json"
     payload = {"value": value}
-    fname.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp = fname.with_suffix(fname.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(fname)

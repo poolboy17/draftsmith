@@ -29,9 +29,19 @@ class LLMClient:
             # Simple deterministic stub for tests/demos
             last_user = next((m["content"] for m in reversed(messages) if m["role"] == "user"), "")
             return f"[DRY_RUN:{model}] {last_user}"
+        if not model or not isinstance(messages, list) or not messages:
+            raise ValueError("Invalid LLM request: model and messages are required")
         client = self._ensure()
-        resp = client.chat.completions.create(model=model, messages=messages)
-        return resp.choices[0].message.content
+        try:
+            resp = client.chat.completions.create(model=model, messages=messages)
+        except Exception as exc:  # noqa: BLE001
+            raise RuntimeError(f"LLM request failed for model '{model}': {exc}") from exc
+        # Safely unwrap content
+        try:
+            return resp.choices[0].message.content  # type: ignore[attr-defined]
+        except Exception as exc:  # noqa: BLE001
+            msg = "Unexpected LLM response shape: " "missing choices/message.content"
+            raise RuntimeError(msg) from exc
 
 
 client = LLMClient(OPENROUTER_API_KEY)

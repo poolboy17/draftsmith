@@ -10,6 +10,12 @@ class DummyResp:
         else:
             self.content = None
 
+    def iter_content(self, chunk_size=8192):  # noqa: D401
+        if self.content is None:
+            return
+        # yield in a single chunk for tests
+        yield self.content
+
     def raise_for_status(self):
         return None
 
@@ -22,7 +28,7 @@ class FakeSession:
         self.posts = []
         self.gets = []
 
-    def get(self, url, params=None, auth=None, timeout=None):  # noqa: D401
+    def get(self, url, params=None, auth=None, timeout=None, **kwargs):  # noqa: D401, ANN003
         self.gets.append((url, params))
         # WP API endpoints contain /wp-json/; return JSON structures
         if "/wp-json/" in url:

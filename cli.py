@@ -1,5 +1,7 @@
 import argparse
 import logging
+import os
+from pathlib import Path
 
 import markdown
 from dotenv import load_dotenv
@@ -28,6 +30,21 @@ def clear_caches():
     _sc.cache_clear()
     _hy.cache_clear()
     logging.info("Cleared LRU caches")
+
+
+def _ensure_dry_run(enabled: bool) -> None:
+    if enabled:
+        os.environ["DRY_RUN"] = "1"
+
+
+def _validate_featured_image(path_or_url: str | None) -> None:
+    if not path_or_url:
+        return
+    if path_or_url.startswith("http://") or path_or_url.startswith("https://"):
+        return
+    p = Path(path_or_url)
+    if not p.exists() or not p.is_file():
+        raise SystemExit(f"--featured-image path not found: {p}")
 
 
 def generate_article(args, prompt, links):
@@ -172,16 +189,13 @@ def main() -> None:
             return
         raise SystemExit(1)
 
-    if not args.prompt:
+    if not args.prompt or not str(args.prompt).strip():
         parser.error("--prompt is required unless --check-wp is provided")
 
     if args.clear_cache:
         clear_caches()
 
-    if args.dry_run:
-        import os
-
-        os.environ["DRY_RUN"] = "1"
+    _ensure_dry_run(args.dry_run)
 
     prompt = args.prompt
     links = args.links or (
@@ -191,6 +205,7 @@ def main() -> None:
     article = generate_article(args, prompt, links)
 
     if args.publish:
+        _validate_featured_image(args.featured_image)
         html = article if args.format == "html" else markdown.markdown(article)
         post = publish_to_wordpress(
             title=prompt,

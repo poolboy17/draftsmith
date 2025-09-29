@@ -22,6 +22,7 @@ app = FastAPI(title="Draftsmith Web")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+TEMPLATE_RESULT = "result.html"
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -32,6 +33,12 @@ async def index(request: Request):
 @app.post("/generate", response_class=HTMLResponse)
 async def generate(request: Request, prompt: str = Form(...), fetch_links_flag: bool = Form(False)):
     try:
+        if not prompt or not str(prompt).strip():
+            return templates.TemplateResponse(
+                request,
+                TEMPLATE_RESULT,
+                {"prompt": "", "outline": "", "article_html": "", "error": "Prompt is required."},
+            )
         links = fetch_links(prompt, max_links=MAX_LINKS) if fetch_links_flag else None
 
         # Build outline and article; leverage existing modules (no file cache here for simplicity)
@@ -46,22 +53,24 @@ async def generate(request: Request, prompt: str = Form(...), fetch_links_flag: 
 
         return templates.TemplateResponse(
             request,
-            "result.html",
+            TEMPLATE_RESULT,
             {
                 "prompt": prompt,
                 "outline": outline,
                 "article_html": article_html,
+                "error": None,
             },
         )
     except Exception as exc:  # noqa: BLE001
         # Minimal error page
         return templates.TemplateResponse(
             request,
-            "result.html",
+            TEMPLATE_RESULT,
             {
                 "prompt": prompt,
                 "outline": "",
-                "article_html": f"<p>Error: {str(exc)}</p>",
+                "article_html": "",
+                "error": str(exc),
             },
         )
 
