@@ -9,7 +9,6 @@ httpx
 python-multipart
 pytest
 pytest-cov
-autopep8
 black
 flake8
 pre-commit

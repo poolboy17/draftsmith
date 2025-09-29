@@ -25,6 +25,7 @@ htmlcov/
 Thumbs.db
 .idea/
 .vscode/
+.trunk/
 
 # Project caches
 .cache/
