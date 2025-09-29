@@ -5,10 +5,4 @@ python-dotenv
 fastapi
 uvicorn
 jinja2
-httpx
 python-multipart
-pytest
-pytest-cov
-black
-flake8
-pre-commit
