@@ -27,21 +27,22 @@ jobs:
                   pip install -r requirements.txt
 
             - name: Validate required secrets
-              env:
-                  WP_URL: ${{ secrets.WP_URL }}
-                  WP_USER: ${{ secrets.WP_USER }}
-                  WP_APP_PASS: ${{ secrets.WP_APP_PASS }}
               run: |
-                  : "${WP_URL:?Missing WP_URL secret}"
-                  : "${WP_USER:?Missing WP_USER secret}"
-                  : "${WP_APP_PASS:?Missing WP_APP_PASS secret}"
-
+                  if [ -z "${{ secrets.WP_URL }}" ]; then
+                    echo "Missing WP_URL secret"
+                    exit 1
+                  fi
+                  if [ -z "${{ secrets.WP_USER }}" ]; then
+                    echo "Missing WP_USER secret"
+                    exit 1
+                  fi
             - name: Run WordPress connectivity check
               env:
                   WP_URL: ${{ secrets.WP_URL }}
                   WP_USER: ${{ secrets.WP_USER }}
                   WP_APP_PASS: ${{ secrets.WP_APP_PASS }}
               run: |
+                  python scripts/wp_check.py
                   if [ -z "${WP_URL}" ]; then
                     echo "Error: WP_URL secret is not set."
                     exit 1

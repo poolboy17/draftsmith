@@ -14,10 +14,16 @@ Generate, format, and optionally publish articles via CLI.
     cd draftsmith
     ```
 
-2. Install dependencies:
+2. Install dependencies (runtime only):
 
     ```powershell
     pip install -r requirements.txt
+    ```
+
+   For development (tests, linting, hooks), also install dev dependencies:
+
+    ```powershell
+    pip install -r requirements-dev.txt
     ```
 
 3. Copy `.env.example` to `.env` and fill in your keys.
@@ -90,6 +96,12 @@ python cli.py --prompt "My Post" --fetch-links --publish --status draft --catego
     ```powershell
     black .
     flake8 .
+    ```
+
+- Enable git hooks (once):
+
+    ```powershell
+    pre-commit install --hook-type pre-commit --hook-type commit-msg
     ```
 
 CI runs formatting, linting, and tests with coverage; a `coverage.xml` report is uploaded per job.

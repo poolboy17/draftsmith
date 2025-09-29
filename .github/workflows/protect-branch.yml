@@ -1,36 +1,36 @@
 name: Protect Main Branch
 
 on:
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
-  protect:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure branch protection for main
-        env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            OWNER: poolboy17
-            REPO: draftsmith
-            BRANCH: main
-        run: |
-          set -euo pipefail
-          # Require the Release workflow status to pass before merging
-          curl -sS -X PUT \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            https://api.github.com/repos/${OWNER}/${REPO}/branches/${BRANCH}/protection \
-            -d @- <<'JSON'
-          {
-            "required_status_checks": {
-              "strict": true,
-              "contexts": [
-                "Release",
-                "Smoke Tests (Web)"
-              ]
-            },
-            "enforce_admins": true,
-            "required_pull_request_reviews": null,
-            "restrictions": null
-          }
-          JSON
+    protect:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Configure branch protection for main
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  OWNER: poolboy17
+                  REPO: draftsmith
+                  BRANCH: main
+              run: |
+                  set -euo pipefail
+                  # Require the Release workflow status to pass before merging
+                  curl -sS -X PUT \
+                    -H "Accept: application/vnd.github+json" \
+                    -H "Authorization: Bearer ${GH_TOKEN}" \
+                    https://api.github.com/repos/${OWNER}/${REPO}/branches/${BRANCH}/protection \
+                    -d @- <<'JSON'
+                  {
+                    "required_status_checks": {
+                      "strict": true,
+                      "contexts": [
+                        "Release",
+                        "Smoke Tests (Web)"
+                      ]
+                    },
+                    "enforce_admins": true,
+                    "required_pull_request_reviews": null,
+                    "restrictions": null
+                  }
+                  JSON
